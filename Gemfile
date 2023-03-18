@@ -2,5 +2,5 @@
 
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in ttrpg-dice_box.gemspec
+# Specify your gem's dependencies in ttrpg-dice_roller.gemspec
 gemspec

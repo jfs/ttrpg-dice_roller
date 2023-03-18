@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/ttrpg/dice_box/version"
+require_relative "lib/ttrpg/dice_roller/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "ttrpg-dice_box"
-  spec.version = TTRPG::DiceBox::VERSION
+  spec.name = "ttrpg-dice_roller"
+  spec.version = TTRPG::DiceRoller::VERSION
   spec.authors = ["Jason Stahl"]
   spec.email = ["contact+#{spec.name}@mechjack.com"]
 

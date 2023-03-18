@@ -12,4 +12,4 @@ Cucumber::Rake::Task.new(:features) do |t|
   t.cucumber_opts = ['--format pretty', '--publish-quiet']
 end
 
-task default: [:features, :spec]
+task default: [:spec, :features]

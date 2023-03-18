@@ -1,3 +1,0 @@
-#! /usr/bin/env ruby
-require 'ttrpg/dice_box/cli'
-TTRPG::DiceBox::CLI.start(ARGV)
