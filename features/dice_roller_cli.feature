@@ -5,25 +5,60 @@ Feature: Dice Roller CLI
 
   Scenario: Echo a single integer
     When I run `roll 11`
-    Then the output should contain "11"
+    Then the output should contain exactly "11"
     And the exit status should be 0
 
   Scenario: Add two integers
     When I run `roll 11+11`
-    Then the output should contain "22"
+    Then the output should contain exactly "22"
     And the exit status should be 0
 
   Scenario: Subtract two integers
     When I run `roll 11-11`
-    Then the output should contain "0"
+    Then the output should contain exactly "0"
     And the exit status should be 0
 
-  Scenario: Multiply two integers
+  Scenario: Multiply two integers with '*'
     When I run `roll 11*11`
-    Then the output should contain "121"
+    Then the output should contain exactly "121"
     And the exit status should be 0
 
-  Scenario: Divide two integers
+  Scenario: Multiply two integers with 'x'
+    When I run `roll 11x11`
+    Then the output should contain exactly "121"
+    And the exit status should be 0
+
+  Scenario: Multiply two integers with 'X'
+    When I run `roll 11X11`
+    Then the output should contain exactly "121"
+    And the exit status should be 0
+
+  Scenario: Multiply two integers with '×'
+    When I run `roll 11×11`
+    Then the output should contain exactly "121"
+    And the exit status should be 0
+
+  Scenario: Multiply two integers with '⋅'
+    When I run `roll 11⋅11`
+    Then the output should contain exactly "121"
+    And the exit status should be 0
+
+  Scenario: Divide two integers with '/'
     When I run `roll 11/11`
-    Then the output should contain "1"
+    Then the output should contain exactly "1"
+    And the exit status should be 0
+
+  Scenario: Divide two integers with '÷'
+    When I run `roll 11÷11`
+    Then the output should contain exactly "1"
+    And the exit status should be 0
+
+  Scenario: Combine mixed operations
+    When I run `roll 55+44-33*22/11`
+    Then the output should contain exactly "33"
+    And the exit status should be 0
+
+  Scenario: Support operation precedence via parenthesis
+    When I run `roll (55+44-33)×(22÷11)`
+    Then the output should contain exactly "132"
     And the exit status should be 0

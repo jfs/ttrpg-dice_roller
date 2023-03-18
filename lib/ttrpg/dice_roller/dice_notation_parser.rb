@@ -5,44 +5,32 @@ require 'parslet'
 module TTRPG
   module DiceRoller
     class DiceNotationParser < Parslet::Parser
-      # whitespace
-      rule(:space) { match('\s').repeat(1) }
-
-      rule(:space?) { space.maybe }
-
       # literals
-      rule(:integer) { match('\d').repeat(1).as(:integer) >> space? }
+      rule(:integer) { match('\d').repeat(1).as(:integer) }
+      rule(:space)  { match('\s').repeat(1) }
+      rule(:space?) { space.maybe }
+      rule(:lparen) { str('(') >> space? }
+      rule(:rparen) { space? >> str(')') }
 
       # operators
-      rule(:divide_op) { match('[/]') >> space? }
-      
-      rule(:plus_op) { match('[+]') >> space? }
-      
-      rule(:minus_op) { match('[-]') >> space? }
-      
-      rule(:times_op) { match('[*]') >> space? }
+      rule(:op_a) { space? >> match('[+]') >> space? }
+      rule(:op_s) { space? >> match('[-]') >> space? }
+      rule(:op_m) { space? >> match('[*xX×⋅]') >> space? }
+      rule(:op_d) { space? >> match('[/÷]') >> space? }
 
-      # operations
-      rule(:addition) {
-        integer.as(:left) >> plus_op.as(:plus_op) >> expression.as(:right)
-      }
-      
-      rule(:division) {
-        integer.as(:left) >> divide_op.as(:divide_op) >> expression.as(:right)
-      }
+      # arithmetic
+      rule(:addition)       { operand.as(:left) >> op_a.as(:a) >> expression.as(:right) }
+      rule(:subtraction)    { operand.as(:left) >> op_s.as(:s) >> expression.as(:right) }
+      rule(:multiplication) { operand.as(:left) >> op_m.as(:m) >> expression.as(:right) }
+      rule(:division)       { operand.as(:left) >> op_d.as(:d) >> expression.as(:right) }
+      rule(:arithmetic)     { addition | subtraction | multiplication | division }
 
-      rule(:multiplication) {
-        integer.as(:left) >> times_op.as(:times_op) >> expression.as(:right)
-      }
+      # grammar
+      rule(:group)   { lparen >> expression.as(:group) >> rparen }
+      rule(:operand) { group | integer }
       
-      rule(:subtraction) {
-        integer.as(:left) >> minus_op.as(:minus_op) >> expression.as(:right)
-      }
-
       # expression
-      rule(:arithmetic) { addition | subtraction | multiplication | division }
-      rule(:expression) { arithmetic | integer }
-      
+      rule(:expression) { arithmetic | operand }
       root(:expression)
     end
   end

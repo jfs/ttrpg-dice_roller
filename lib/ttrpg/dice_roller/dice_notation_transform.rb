@@ -4,60 +4,26 @@ require 'parslet'
 
 module TTRPG
   module DiceRoller
-    IntegerLiteral = Struct.new(:int) do
-      def eval
-        int.to_i
-      end
-    end
+    # operands
+    ExpressionGroup = Struct.new(:group) { def eval; group.eval; end }
+    IntegerLiteral = Struct.new(:int)    { def eval; int.to_i; end }
 
-    Addition = Struct.new(:left, :right) do
-      def eval
-        left.eval + right.eval
-      end
-    end
-
-    Division = Struct.new(:left, :right) do
-      def eval
-        left.eval / right.eval
-      end
-    end
-
-    Multiplication = Struct.new(:left, :right) do
-      def eval
-        left.eval * right.eval
-      end
-    end
-
-    Subtraction = Struct.new(:left, :right) do
-      def eval
-        left.eval - right.eval
-      end
-    end
+    # operations
+    Addition = Struct.new(:left, :right)       { def eval; left.eval + right.eval; end }
+    Division = Struct.new(:left, :right)       { def eval; left.eval / right.eval; end }
+    Multiplication = Struct.new(:left, :right) { def eval; left.eval * right.eval; end }
+    Subtraction = Struct.new(:left, :right)    { def eval; left.eval - right.eval; end }
 
     class DiceNotationTransform < Parslet::Transform
-      # literals
+      # operands
+      rule(:group => simple(:group)) { ExpressionGroup.new(group) }
       rule(:integer => simple(:integer)) { IntegerLiteral.new(integer) }
 
       # operations
-      rule(:left => simple(:left), :right => simple(:right),
-          :plus_op => simple(:plus_op)) {
-        Addition.new(left, right)
-      }
-
-      rule(:left => simple(:left), :right => simple(:right),
-          :minus_op => simple(:minus_op)) {
-        Subtraction.new(left, right)
-      }
-      
-      rule(:left => simple(:left), :right => simple(:right),
-          :times_op => simple(:times_op)) {
-        Multiplication.new(left, right)
-      }
-      
-      rule(:left => simple(:left), :right => simple(:right),
-          :divide_op => simple(:divide_op)) {
-        Division.new(left, right)
-      }
+      rule(:left => simple(:left), :right => simple(:right), :a => simple(:a)) { Addition.new(left, right) }
+      rule(:left => simple(:left), :right => simple(:right), :s => simple(:s)) { Subtraction.new(left, right) }
+      rule(:left => simple(:left), :right => simple(:right), :m => simple(:m)) { Multiplication.new(left, right) }
+      rule(:left => simple(:left), :right => simple(:right), :d => simple(:d)) { Division.new(left, right) }      
     end
   end
 end

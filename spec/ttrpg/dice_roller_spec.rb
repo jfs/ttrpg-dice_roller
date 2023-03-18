@@ -13,10 +13,31 @@ RSpec.describe TTRPG::DiceRoller do
   it "subtracts two intergers" do
     expect(TTRPG::DiceRoller.roll('11 - 11')).to eq(0)
   end
-  it "multiplies two intergers" do
+  it "multiplies two intergers with '*' operator" do
     expect(TTRPG::DiceRoller.roll('11 * 11')).to eq(121)
   end
-  it "divides two intergers" do
+  it "multiplies two intergers with 'x' operator" do
+    expect(TTRPG::DiceRoller.roll('11 x 11')).to eq(121)
+  end
+  it "multiplies two intergers with 'X' operator" do
+    expect(TTRPG::DiceRoller.roll('11 X 11')).to eq(121)
+  end
+  it "multiplies two intergers with '×' operator" do
+    expect(TTRPG::DiceRoller.roll('11 × 11')).to eq(121)
+  end
+  it "multiplies two intergers with '⋅' operator" do
+    expect(TTRPG::DiceRoller.roll('11 ⋅ 11')).to eq(121)
+  end
+  it "divides two intergers with '/' operator" do
     expect(TTRPG::DiceRoller.roll('11 / 11')).to eq(1)
+  end
+  it "divides two intergers with '÷' operator" do
+    expect(TTRPG::DiceRoller.roll('11 ÷ 11')).to eq(1)
+  end
+  it "combines mixed operations" do
+    expect(TTRPG::DiceRoller.roll('55 + 44 - 33 × 22 ÷ 11')).to eq(33)
+  end
+  it "supports operation precedence via parenthesis" do
+    expect(TTRPG::DiceRoller.roll('(55 + 44 - 33) × (22 ÷ 11)')).to eq(132)
   end
 end
