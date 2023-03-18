@@ -16,6 +16,18 @@ module TTRPG
       end
     end
 
+    Division = Struct.new(:left, :right) do
+      def eval
+        left.eval / right.eval
+      end
+    end
+
+    Multiplication = Struct.new(:left, :right) do
+      def eval
+        left.eval * right.eval
+      end
+    end
+
     Subtraction = Struct.new(:left, :right) do
       def eval
         left.eval - right.eval
@@ -31,9 +43,20 @@ module TTRPG
           :plus_op => simple(:plus_op)) {
         Addition.new(left, right)
       }
+
       rule(:left => simple(:left), :right => simple(:right),
           :minus_op => simple(:minus_op)) {
         Subtraction.new(left, right)
+      }
+      
+      rule(:left => simple(:left), :right => simple(:right),
+          :times_op => simple(:times_op)) {
+        Multiplication.new(left, right)
+      }
+      
+      rule(:left => simple(:left), :right => simple(:right),
+          :divide_op => simple(:divide_op)) {
+        Division.new(left, right)
       }
     end
   end

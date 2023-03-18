@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'aruba/rspec'
 require "ttrpg/dice_roller"
 
 RSpec.configure do |config|
