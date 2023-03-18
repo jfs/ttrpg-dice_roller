@@ -62,3 +62,18 @@ Feature: Dice Roller CLI
     When I run `roll (55+44-33)×(22÷11)`
     Then the output should contain exactly "132"
     And the exit status should be 0
+
+  Scenario: Roll a single die
+    When I run `roll d6`
+    Then the output should be an integer between "1" and "6"
+    And the exit status should be 0
+
+  Scenario: Roll a group of dice
+    When I run `roll 7d6`
+    Then the output should be an integer between "7" and "42"
+    And the exit status should be 0
+
+  Scenario: Roll a group of dice as part of arithmatic
+    When I run `roll 10x7d6`
+    Then the output should be an integer between "70" and "420"
+    And the exit status should be 0

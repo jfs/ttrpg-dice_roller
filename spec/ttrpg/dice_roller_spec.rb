@@ -40,4 +40,13 @@ RSpec.describe TTRPG::DiceRoller do
   it "supports operation precedence via parenthesis" do
     expect(TTRPG::DiceRoller.roll('(55 + 44 - 33) × (22 ÷ 11)')).to eq(132)
   end
+  it "rolls a single die" do
+    expect(TTRPG::DiceRoller.roll('d6')).to be_between(1,6)
+  end
+  it "rolls a group of dice" do
+    expect(TTRPG::DiceRoller.roll('7d6')).to be_between(7,42)
+  end
+  it "rolls a group of dice as part of arithmatic" do
+    expect(TTRPG::DiceRoller.roll('10 x 7d6')).to be_between(70,420)
+  end
 end

@@ -12,6 +12,10 @@ module TTRPG
       rule(:lparen) { str('(') >> space? }
       rule(:rparen) { space? >> str(')') }
 
+      # dice notation
+      rule(:dice_code) { integer.maybe.as(:count) >> match('[dD]') >> integer.as(:sides) }
+      rule(:dice_notation) { dice_code.as(:dice_code) }
+
       # operators
       rule(:op_a) { space? >> match('[+]') >> space? }
       rule(:op_s) { space? >> match('[-]') >> space? }
@@ -27,7 +31,7 @@ module TTRPG
 
       # grammar
       rule(:group)   { lparen >> expression.as(:group) >> rparen }
-      rule(:operand) { group | integer }
+      rule(:operand) { group | dice_notation | integer }
       
       # expression
       rule(:expression) { arithmetic | operand }
