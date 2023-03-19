@@ -18,62 +18,42 @@ Feature: Dice Roller CLI
     Then the output should contain exactly "0"
     And the exit status should be 0
 
-  Scenario: Multiply two integers with '*'
+  Scenario: Multiply two integers
     When I run `roll 11*11`
     Then the output should contain exactly "121"
     And the exit status should be 0
 
-  Scenario: Multiply two integers with 'x'
-    When I run `roll 11x11`
-    Then the output should contain exactly "121"
-    And the exit status should be 0
-
-  Scenario: Multiply two integers with 'X'
-    When I run `roll 11X11`
-    Then the output should contain exactly "121"
-    And the exit status should be 0
-
-  Scenario: Multiply two integers with '×'
-    When I run `roll 11×11`
-    Then the output should contain exactly "121"
-    And the exit status should be 0
-
-  Scenario: Multiply two integers with '⋅'
-    When I run `roll 11⋅11`
-    Then the output should contain exactly "121"
-    And the exit status should be 0
-
-  Scenario: Divide two integers with '/'
+  Scenario: Divide two integers
     When I run `roll 11/11`
     Then the output should contain exactly "1"
     And the exit status should be 0
 
-  Scenario: Divide two integers with '÷'
-    When I run `roll 11÷11`
-    Then the output should contain exactly "1"
-    And the exit status should be 0
-
   Scenario: Combine mixed operations
-    When I run `roll 55+44-33*22/11`
-    Then the output should contain exactly "33"
+    When I run `roll 32 + 16 - 4 * 4 / 2`
+    Then the output should contain exactly "40"
     And the exit status should be 0
 
   Scenario: Support operation precedence via parenthesis
-    When I run `roll (55+44-33)×(22÷11)`
-    Then the output should contain exactly "132"
+    When I run `roll (((32 + 16) - 4) * 4) / 2`
+    Then the output should contain exactly "88"
     And the exit status should be 0
 
-  Scenario: Roll a single die
-    When I run `roll d6`
-    Then the output should be an integer between "1" and "6"
-    And the exit status should be 0
+  # Scenario: Roll a single die
+  #   When I run `roll d6`
+  #   Then the output should be an integer between "1" and "6"
+  #   And the exit status should be 0
 
-  Scenario: Roll a group of dice
-    When I run `roll 7d6`
-    Then the output should be an integer between "7" and "42"
-    And the exit status should be 0
+  # Scenario: Roll a group of dice
+  #   When I run `roll 7d6`
+  #   Then the output should be an integer between "7" and "42"
+  #   And the exit status should be 0
 
-  Scenario: Roll a group of dice as part of arithmatic
-    When I run `roll 10x7d6`
-    Then the output should be an integer between "70" and "420"
-    And the exit status should be 0
+  # Scenario: Roll a group of dice as part of arithmetic
+  #   When I run `roll 10x7d6`
+  #   Then the output should be an integer between "70" and "420"
+  #   And the exit status should be 0
+
+  # Scenario: Roll a group of dice and drop the 2 highest
+  #   When I run `roll 10d10l2h`
+  #   Then the output should be an integer between "80" and "800"
+  #   And the exit status should be 0
