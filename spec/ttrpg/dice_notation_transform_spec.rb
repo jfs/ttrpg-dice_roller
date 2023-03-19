@@ -84,4 +84,25 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationTransform do
     result = transform.apply(parser.parse('((((32+16)-4)*4)/2)')).eval
     expect(result).to eql(88)
   end
+
+  it 'evaluates a dice pool [10d10]' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    transform = TTRPG::DiceRoller::DiceNotationTransform.new
+    result = transform.apply(parser.parse('10d10')).eval
+    expect(result).to be_between(10,100)
+  end
+
+  it 'evaluates a statement that includes a dice pool [10*10d10]' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    transform = TTRPG::DiceRoller::DiceNotationTransform.new
+    result = transform.apply(parser.parse('10*10d10')).eval
+    expect(result).to be_between(100,1000)
+  end
+
+  it 'evaluates a dice pool with an implied dice count of 1 [d10]' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    transform = TTRPG::DiceRoller::DiceNotationTransform.new
+    result = transform.apply(parser.parse('d10')).eval
+    expect(result).to be_between(1,10)
+  end
 end

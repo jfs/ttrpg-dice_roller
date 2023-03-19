@@ -369,5 +369,57 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
       }
     })
   end
+
+  it 'parses a dice pool [10d10]' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse('10d10')
+    expect(result).to include({
+      dice_pool: {
+        count: {
+          integer: '10'
+        },
+        die: 'd',
+        sides: {
+          integer: '10'
+        }
+      }
+    })
+  end
+
+  it 'parses a statement that includes a dice pool [10*10d10]' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse('10*10d10')
+    expect(result).to include({
+      left: {
+        integer: '10'
+      },
+      times: '*',
+      right: {
+        dice_pool: {
+          count: {
+            integer: '10'
+          },
+          die: 'd',
+          sides: {
+            integer: '10'
+          }
+        }
+      }
+    })
+  end
+
+  it 'parses a dice pool with implied count of 1 [d10]' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse('d10')
+    expect(result).to include({
+      dice_pool: {
+        count: nil,
+        die: 'd',
+        sides: {
+          integer: '10'
+        }
+      }
+    })
+  end
   
 end

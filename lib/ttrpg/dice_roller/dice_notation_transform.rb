@@ -4,39 +4,40 @@ require 'parslet'
 
 module TTRPG
   module DiceRoller
-    # operands
-    IntegerLiteral = Struct.new(:integer) {
+    # dice notation
+    DicePool = Struct.new(:count, :die, :sides) {
       def eval
-        integer.to_i
+        evaled_count = count != nil ? count.eval : 1
+        rolls = []
+        evaled_count.times do
+          rolls << rand(1..sides.eval)
+        end
+        return rolls
       end
     }
 
+    # operands
     ExpressionGroup = Struct.new(:group) {
       def eval
         group.eval
       end
     }
 
-    # DiceNotation    = Struct.new(:dice_code) {
-    #   def eval
-    #     total = 0
-    #     dice_code.eval.each do |value|
-    #       total += value
-    #     end
-    #     return total
-    #   end
-    # }
+    DiceNotation = Struct.new(:dice_code) {
+      def eval
+        total = 0
+        dice_code.eval.each do |value|
+          total += value
+        end
+        return total
+      end
+    }
 
-    # DicePool        = Struct.new(:count, :sides) {
-    #   def eval
-    #     evaled_count = count != nil ? count.eval : 1
-    #     rolls = []
-    #     evaled_count.times do
-    #       rolls << rand(1..sides.eval)
-    #     end
-    #     return rolls
-    #   end
-    # }
+    IntegerLiteral = Struct.new(:integer) {
+      def eval
+        integer.to_i
+      end
+    }
 
     # operations
     Addition = Struct.new(:left, :right) {
@@ -64,16 +65,25 @@ module TTRPG
     }
 
     class DiceNotationTransform < Parslet::Transform
+      # dice notation
+      rule({
+        count: simple(:count),
+        die: simple(:die),
+        sides: simple(:sides)
+      }) { DicePool.new(count, die, sides) }
+    
       # operands
+      rule({
+        group: simple(:group)
+      }) { ExpressionGroup.new(group) }
+    
+      rule({
+        dice_pool: simple(:dice_pool)
+      }) { DiceNotation.new(dice_pool) }
+
       rule({
         integer: simple(:integer)
       }) { IntegerLiteral.new(integer) }
-    
-      rule({
-        :group => simple(:group)
-      }) { ExpressionGroup.new(group) }
-    
-      # rule(:count => simple(:count), :sides => simple(:sides)) { DicePool.new(count, sides) }
     
       # rule(:dice_pool => simple(:dice_pool)) { DiceNotation.new(dice_pool) }
 

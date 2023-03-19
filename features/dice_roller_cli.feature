@@ -29,29 +29,29 @@ Feature: Dice Roller CLI
     And the exit status should be 0
 
   Scenario: Combine mixed operations
-    When I run `roll 32 + 16 - 4 * 4 / 2`
+    When I run `roll 32+16-4*4/2`
     Then the output should contain exactly "40"
     And the exit status should be 0
 
   Scenario: Support operation precedence via parenthesis
-    When I run `roll (((32 + 16) - 4) * 4) / 2`
+    When I run `roll (((32+16)-4)*4)/2`
     Then the output should contain exactly "88"
     And the exit status should be 0
 
-  # Scenario: Roll a single die
-  #   When I run `roll d6`
-  #   Then the output should be an integer between "1" and "6"
-  #   And the exit status should be 0
+  Scenario: Roll a group of dice
+    When I run `roll 10d10`
+    Then the output should be an integer between "10" and "100"
+    And the exit status should be 0
 
-  # Scenario: Roll a group of dice
-  #   When I run `roll 7d6`
-  #   Then the output should be an integer between "7" and "42"
-  #   And the exit status should be 0
+  Scenario: Roll a group of dice as part of arithmetic
+    When I run `roll 10*10d10`
+    Then the output should be an integer between "100" and "1000"
+    And the exit status should be 0
 
-  # Scenario: Roll a group of dice as part of arithmetic
-  #   When I run `roll 10x7d6`
-  #   Then the output should be an integer between "70" and "420"
-  #   And the exit status should be 0
+  Scenario: Roll a single die
+    When I run `roll d10`
+    Then the output should be an integer between "1" and "10"
+    And the exit status should be 0
 
   # Scenario: Roll a group of dice and drop the 2 highest
   #   When I run `roll 10d10l2h`

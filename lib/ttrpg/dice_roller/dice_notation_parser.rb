@@ -14,9 +14,7 @@ module TTRPG
       rule(:rparen) { str(')') }
 
       # dice notation
-      # rule(:dice_pool) { integer.maybe.as(:count) >> match('[dD]') >> integer.as(:sides) }
-      # rule(:dice_notation) { dice_pool.as(:dice_pool) >> remove_dice.maybe.as(:remove_dice) }
-      # rule(:remove_dice) { match('[rR]').as(:remove) >> integer.maybe.as(:count) >> (match('[hH]').as(:highest) | match('[hH]').as(:lowest))  }
+      rule(:dice_pool) { integer.maybe.as(:count) >> match('[dD]').as(:die) >> integer.as(:sides) }
 
       # operators
       rule(:op_addition) { str('+').as(:plus) }
@@ -25,10 +23,10 @@ module TTRPG
       rule(:op_division) { str('/').as(:divided_by) }
 
       # operands
+      rule(:group) { lparen >> space? >> expression.as(:group) >> space? >> rparen }
+      rule(:dice_notation) { dice_pool.as(:dice_pool) }
       rule(:integer) { match('\d').repeat(1).as(:integer) }
-      rule(:group)   { lparen >> space? >> expression.as(:group) >> space? >> rparen }
-      rule(:operand) { group | integer }
-      # rule(:operand) { group | dice_notation | integer }
+      rule(:operand) { group | dice_notation | integer }
 
       # statements
       rule(:addition) { operand.as(:left) >> space? >> op_addition >> space? >> expression.as(:right) }
