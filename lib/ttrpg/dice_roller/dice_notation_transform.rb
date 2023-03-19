@@ -6,13 +6,38 @@ module TTRPG
   module DiceRoller
     # dice notation
     DicePool = Struct.new(:count, :die, :sides) {
-      def eval
+      def roll
         evaled_count = count != nil ? count.eval : 1
         rolls = []
+
         evaled_count.times do
           rolls << rand(1..sides.eval)
         end
         return rolls
+      end
+    }
+
+    RemoveHighest = Struct.new(:remove, :count, :highest) {
+      def remove(dice_pool)
+        evaled_count = count != nil ? count.eval : 1
+        
+        dice_pool.sort!
+        evaled_count.times do
+          dice_pool.pop if dice_pool.size > 0
+        end
+        return dice_pool
+      end
+    }
+
+    RemoveLowest = Struct.new(:remove, :count, :lowest) {
+      def remove(dice_pool)
+        evaled_count = count != nil ? count.eval : 1
+        
+        dice_pool.sort!
+        evaled_count.times do
+          dice_pool.shift if dice_pool.size > 0
+        end
+        return dice_pool
       end
     }
 
@@ -23,13 +48,17 @@ module TTRPG
       end
     }
 
-    DiceNotation = Struct.new(:dice_code) {
+    DiceNotation = Struct.new(:dice_pool, :remove_highest, :remove_lowest) {
       def eval
-        total = 0
-        dice_code.eval.each do |value|
-          total += value
+        final_result = 0
+        dice_rolls = dice_pool.roll
+        dice_rolls = remove_highest.remove(dice_rolls) if remove_highest
+        dice_rolls = remove_lowest.remove(dice_rolls) if remove_lowest
+
+        dice_rolls.each do |value|
+          final_result += value
         end
-        return total
+        return final_result
       end
     }
 
@@ -72,14 +101,28 @@ module TTRPG
         sides: simple(:sides)
       }) { DicePool.new(count, die, sides) }
     
+      rule({
+        remove: simple(:remove),
+        count: simple(:count),
+        highest: simple(:highest)
+      }) { RemoveHighest.new(remove, count, highest) }
+    
+      rule({
+        remove: simple(:remove),
+        count: simple(:count),
+        lowest: simple(:lowest)
+      }) { RemoveLowest.new(remove, count, lowest) }
+    
       # operands
       rule({
         group: simple(:group)
       }) { ExpressionGroup.new(group) }
     
       rule({
-        dice_pool: simple(:dice_pool)
-      }) { DiceNotation.new(dice_pool) }
+        dice_pool: simple(:dice_pool),
+        remove_highest: simple(:remove_highest),
+        remove_lowest: simple(:remove_lowest)
+      }) { DiceNotation.new(dice_pool, remove_highest, remove_lowest) }
 
       rule({
         integer: simple(:integer)

@@ -15,6 +15,8 @@ module TTRPG
 
       # dice notation
       rule(:dice_pool) { integer.maybe.as(:count) >> match('[dD]').as(:die) >> integer.as(:sides) }
+      rule(:remove_highest) { match('[rR]').as(:remove) >> integer.maybe.as(:count) >> match('[hH]').as(:highest) }
+      rule(:remove_lowest) { match('[rR]').as(:remove) >> integer.maybe.as(:count) >> match('[lL]').as(:lowest) }
 
       # operators
       rule(:op_addition) { str('+').as(:plus) }
@@ -24,7 +26,7 @@ module TTRPG
 
       # operands
       rule(:group) { lparen >> space? >> expression.as(:group) >> space? >> rparen }
-      rule(:dice_notation) { dice_pool.as(:dice_pool) }
+      rule(:dice_notation) { dice_pool.as(:dice_pool) >> remove_highest.maybe.as(:remove_highest) >> remove_lowest.maybe.as(:remove_lowest) }
       rule(:integer) { match('\d').repeat(1).as(:integer) }
       rule(:operand) { group | dice_notation | integer }
 

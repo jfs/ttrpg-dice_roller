@@ -38,22 +38,37 @@ Feature: Dice Roller CLI
     Then the output should contain exactly "88"
     And the exit status should be 0
 
-  Scenario: Roll a group of dice
-    When I run `roll 10d10`
-    Then the output should be an integer between "10" and "100"
+  Scenario: Rolls a dice pool
+    When I run `roll 10d1`
+    Then the output should contain exactly "10"
     And the exit status should be 0
 
-  Scenario: Roll a group of dice as part of arithmetic
-    When I run `roll 10*10d10`
-    Then the output should be an integer between "100" and "1000"
+  Scenario: Rolls a dice pool as part of arithmetic
+    When I run `roll 10*10d1`
+    Then the output should contain exactly "100"
     And the exit status should be 0
 
-  Scenario: Roll a single die
-    When I run `roll d10`
-    Then the output should be an integer between "1" and "10"
+  Scenario: Rolls a dice pool with implied count of 1
+    When I run `roll d1`
+    Then the output should contain exactly "1"
     And the exit status should be 0
 
-  # Scenario: Roll a group of dice and drop the 2 highest
-  #   When I run `roll 10d10l2h`
-  #   Then the output should be an integer between "80" and "800"
-  #   And the exit status should be 0
+  Scenario: Rolls a dice pool that removes the 2 highest values
+    When I run `roll 10d1r2h`
+    Then the output should contain exactly "8"
+    And the exit status should be 0
+
+  Scenario: Rolls a dice pool that removes an implied 1 highest value
+    When I run `roll 10d1rh`
+    Then the output should contain exactly "9"
+    And the exit status should be 0
+
+  Scenario: Rolls a dice pool that removes the 2 lowest values
+    When I run `roll 10d1r2l`
+    Then the output should contain exactly "8"
+    And the exit status should be 0
+
+  Scenario: Rolls a dice pool that removes an implied 1 lowest value
+    When I run `roll 10d1rl`
+    Then the output should contain exactly "9"
+    And the exit status should be 0
