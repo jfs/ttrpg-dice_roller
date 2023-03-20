@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
+require 'parslet/convenience'
+
 RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses single digit integers [1]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('1')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('1')
     expect(result).to include({
       integer: '1'
     })
@@ -16,11 +14,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses multi digit integers [111]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('111')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('111')
     expect(result).to include({
       integer: '111'
     })
@@ -38,11 +32,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses addition operators [+]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.op_addition.parse('+')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.op_addition.parse('+')
     expect(result).to include({
       plus: '+'
     })
@@ -50,11 +40,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses simple addition statements [2+2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2+2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2+2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -68,11 +54,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses simple addition statements that include whitespace [2 + 2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2 + 2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2 + 2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -86,11 +68,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses compound addition statements from right to left [2+2+2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2+2+2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2+2+2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -110,11 +88,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses subtraction operators [-]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.op_subtraction.parse('-')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.op_subtraction.parse('-')
     expect(result).to include({
       minus: '-'
     })
@@ -122,11 +96,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses simple subtraction statements [2-2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2-2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2-2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -140,11 +110,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses simple subtraction statements that include whitespace [2 - 2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2 - 2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2 - 2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -158,11 +124,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses compound subtraction statements from right to left [2-2-2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2-2-2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2-2-2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -182,11 +144,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses compound mixed statements from right to left [2+2-2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2+2-2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2+2-2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -206,11 +164,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses multiplication operators [*]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.op_multiplication.parse('*')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.op_multiplication.parse('*')
     expect(result).to include({
       times: '*'
     })
@@ -218,11 +172,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses simple multiplication statements [2*2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2*2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2*2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -236,11 +186,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses simple multiplication statements that include whitespace [2 * 2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2 * 2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2 * 2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -254,11 +200,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses compound multiplication statements from right to left [2*2*2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2*2*2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2*2*2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -278,11 +220,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses compound mixed statements from right to left [2+2-2*2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2+2-2*2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2+2-2*2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -308,11 +246,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses division operators [/]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.op_division.parse('/')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.op_division.parse('/')
     expect(result).to include({
       divided_by: '/'
     })
@@ -320,11 +254,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
   
   it 'parses simple division statements [2/2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2/2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2/2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -338,11 +268,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
   
   it 'parses simple division statements that include whitespace [2 / 2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2 / 2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2 / 2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -356,11 +282,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
   
   it 'parses compound division statements from right to left [2/2/2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2/2/2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2/2/2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -380,11 +302,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
   
   it 'parses compound mixed statements from right to left [2+2-2*2/2]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('2+2-2*2/2')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('2+2-2*2/2')
     expect(result).to include({
       left: {
         integer: '2'
@@ -416,11 +334,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses groups of integers and statements using parenthesis [((((2+2)-2)*2)/2)]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('((((2+2)-2)*2)/2)')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('((((2+2)-2)*2)/2)')
     expect(result).to include({
       group: {
         left: {
@@ -460,11 +374,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses a dice pool [10d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('10d10')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('10d10')
     expect(result).to include({
       dice_pool: {
         count: {
@@ -480,11 +390,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses a statement that includes a dice pool [10*10d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('10*10d10')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('10*10d10')
     expect(result).to include({
       left: {
         integer: '10'
@@ -508,11 +414,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses a dice pool with implied count of 1 [d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('d10')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('d10')
     expect(result).to include({
       dice_pool: {
         count: nil,
@@ -526,11 +428,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses a dice pool that removes the two highest values [10d10r2h]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('10d10r2h')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('10d10r2h')
     expect(result).to include({
       dice_pool: {
         count: {
@@ -554,11 +452,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses a dice pool that removes an implied one highest value [10d10rh]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('10d10rh')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('10d10rh')
     expect(result).to include({
       dice_pool: {
         count: {
@@ -580,11 +474,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses a dice pool that removes the two lowest values [10d10r2l]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('10d10r2l')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('10d10r2l')
     expect(result).to include({
       dice_pool: {
         count: {
@@ -608,11 +498,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses a dice pool that removes an implied one lowest value [10d10rl]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('10d10rl')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('10d10rl')
     expect(result).to include({
       dice_pool: {
         count: {
@@ -634,11 +520,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
   it 'parses a dice pool that removes the two highest and lowest values [10d10r2hr2l]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    begin
-      result = parser.parse('10d10r2hr2l')
-    rescue Parslet::ParseFailed => failure
-      puts failure.parse_failure_cause.ascii_tree
-    end
+    result = parser.parse_with_debug('10d10r2hr2l')
     expect(result).to include({
       dice_pool: {
         count: {
