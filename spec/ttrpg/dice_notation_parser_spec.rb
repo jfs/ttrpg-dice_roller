@@ -458,10 +458,10 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
     })
   end
 
-  it 'parses a dice pool [10d1]' do
+  it 'parses a dice pool [10d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     begin
-      result = parser.parse('10d1')
+      result = parser.parse('10d10')
     rescue Parslet::ParseFailed => failure
       puts failure.parse_failure_cause.ascii_tree
     end
@@ -472,16 +472,16 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
         },
         die: 'd',
         sides: {
-          integer: '1'
+          integer: '10'
         }
       }
     })
   end
 
-  it 'parses a statement that includes a dice pool [10*10d1]' do
+  it 'parses a statement that includes a dice pool [10*10d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     begin
-      result = parser.parse('10*10d1')
+      result = parser.parse('10*10d10')
     rescue Parslet::ParseFailed => failure
       puts failure.parse_failure_cause.ascii_tree
     end
@@ -497,7 +497,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
           },
           die: 'd',
           sides: {
-            integer: '1'
+            integer: '10'
           }
         },
         remove_highest: nil,
@@ -506,10 +506,10 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
     })
   end
 
-  it 'parses a dice pool with implied count of 1 [d1]' do
+  it 'parses a dice pool with implied count of 1 [d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     begin
-      result = parser.parse('d1')
+      result = parser.parse('d10')
     rescue Parslet::ParseFailed => failure
       puts failure.parse_failure_cause.ascii_tree
     end
@@ -518,16 +518,16 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
         count: nil,
         die: 'd',
         sides: {
-          integer: '1'
+          integer: '10'
         }
       }
     })
   end
 
-  it 'parses a dice pool that removes the two highest values [10d1r2h]' do
+  it 'parses a dice pool that removes the two highest values [10d10r2h]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     begin
-      result = parser.parse('10d1r2h')
+      result = parser.parse('10d10r2h')
     rescue Parslet::ParseFailed => failure
       puts failure.parse_failure_cause.ascii_tree
     end
@@ -538,7 +538,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
         },
         die: 'd',
         sides: {
-          integer: '1'
+          integer: '10'
         }
       },
       remove_highest: {
@@ -552,10 +552,10 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
     })
   end
 
-  it 'parses a dice pool that removes an implied one highest value [10d1rh]' do
+  it 'parses a dice pool that removes an implied one highest value [10d10rh]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     begin
-      result = parser.parse('10d1rh')
+      result = parser.parse('10d10rh')
     rescue Parslet::ParseFailed => failure
       puts failure.parse_failure_cause.ascii_tree
     end
@@ -566,7 +566,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
         },
         die: 'd',
         sides: {
-          integer: '1'
+          integer: '10'
         }
       },
       remove_highest: {
@@ -578,10 +578,10 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
     })
   end
 
-  it 'parses a dice pool that removes the two lowest values [10d1r2l]' do
+  it 'parses a dice pool that removes the two lowest values [10d10r2l]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     begin
-      result = parser.parse('10d1r2l')
+      result = parser.parse('10d10r2l')
     rescue Parslet::ParseFailed => failure
       puts failure.parse_failure_cause.ascii_tree
     end
@@ -592,7 +592,7 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
         },
         die: 'd',
         sides: {
-          integer: '1'
+          integer: '10'
         }
       },
       remove_highest: nil,
@@ -606,10 +606,10 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
     })
   end
 
-  it 'parses a dice pool that removes an implied one lowest value [10d1rl]' do
+  it 'parses a dice pool that removes an implied one lowest value [10d10rl]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     begin
-      result = parser.parse('10d1rl')
+      result = parser.parse('10d10rl')
     rescue Parslet::ParseFailed => failure
       puts failure.parse_failure_cause.ascii_tree
     end
@@ -620,13 +620,47 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
         },
         die: 'd',
         sides: {
-          integer: '1'
+          integer: '10'
         }
       },
       remove_highest: nil,
       remove_lowest: {
         remove: 'r',
         count: nil,
+        lowest: 'l'
+      }
+    })
+  end
+
+  it 'parses a dice pool that removes the two highest and lowest values [10d10r2hr2l]' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    begin
+      result = parser.parse('10d10r2hr2l')
+    rescue Parslet::ParseFailed => failure
+      puts failure.parse_failure_cause.ascii_tree
+    end
+    expect(result).to include({
+      dice_pool: {
+        count: {
+          integer: '10'
+        },
+        die: 'd',
+        sides: {
+          integer: '10'
+        }
+      },
+      remove_highest: {
+        remove: 'r',
+        count: {
+          integer: '2'
+        },
+        highest: 'h'
+      },
+      remove_lowest: {
+        remove: 'r',
+        count: {
+          integer: '2'
+        },
         lowest: 'l'
       }
     })

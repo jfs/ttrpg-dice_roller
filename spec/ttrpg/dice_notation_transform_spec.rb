@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe TTRPG::DiceRoller::DiceNotationTransform do
+  before(:each) do
+    ENV['DICE_ROLLER_STRATEGY'] = TTRPG::DiceRoller::SEQUENCE
+    ENV['DICE_ROLLER_SEQUENCE_COUNT'] = '0'
+  end
+
   it 'single digit integer literal evaluates to itself [1 = 1]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     transform = TTRPG::DiceRoller::DiceNotationTransform.new
@@ -85,52 +90,59 @@ RSpec.describe TTRPG::DiceRoller::DiceNotationTransform do
     expect(result).to eql(88)
   end
 
-  it 'evaluates a dice pool [10d1]' do
+  it 'evaluates a dice pool [10d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     transform = TTRPG::DiceRoller::DiceNotationTransform.new
-    result = transform.apply(parser.parse('10d1')).eval
-    expect(result).to eq(10)
+    result = transform.apply(parser.parse('10d10')).eval
+    expect(result).to eq(55)
   end
 
-  it 'evaluates a statement that includes a dice pool [10*10d1]' do
+  it 'evaluates a statement that includes a dice pool [10*10d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     transform = TTRPG::DiceRoller::DiceNotationTransform.new
-    result = transform.apply(parser.parse('10*10d1')).eval
-    expect(result).to eq(100)
+    result = transform.apply(parser.parse('10*10d10')).eval
+    expect(result).to eq(550)
   end
 
-  it 'evaluates a dice pool with an implied dice count of 1 [d1]' do
+  it 'evaluates a dice pool with an implied dice count of 1 [d10]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     transform = TTRPG::DiceRoller::DiceNotationTransform.new
-    result = transform.apply(parser.parse('d1')).eval
+    result = transform.apply(parser.parse('d10')).eval
     expect(result).to eq(1)
   end
 
-  it 'evaluates a dice pool that removes the two highest values [10d1r2h]' do
+  it 'evaluates a dice pool that removes the two highest values [10d10r2h]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     transform = TTRPG::DiceRoller::DiceNotationTransform.new
-    result = transform.apply(parser.parse('10d1r2h')).eval
-    expect(result).to eq(8)
+    result = transform.apply(parser.parse('10d10r2h')).eval
+    expect(result).to eq(36)
   end
 
-  it 'evaluates a dice pool that removes an implied one highest values [10d1rh]' do
+  it 'evaluates a dice pool that removes an implied one highest values [10d10rh]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     transform = TTRPG::DiceRoller::DiceNotationTransform.new
-    result = transform.apply(parser.parse('10d1rh')).eval
-    expect(result).to eq(9)
+    result = transform.apply(parser.parse('10d10rh')).eval
+    expect(result).to eq(45)
   end
 
-  it 'evaluates a dice pool that removes the two lowest values [10d1r2l]' do
+  it 'evaluates a dice pool that removes the two lowest values [10d10r2l]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     transform = TTRPG::DiceRoller::DiceNotationTransform.new
-    result = transform.apply(parser.parse('10d1r2l')).eval
-    expect(result).to eq(8)
+    result = transform.apply(parser.parse('10d10r2l')).eval
+    expect(result).to eq(52)
   end
 
-  it 'evaluates a dice pool that removes an implied one lowest values [10d1rl]' do
+  it 'evaluates a dice pool that removes an implied one lowest values [10d10rl]' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     transform = TTRPG::DiceRoller::DiceNotationTransform.new
-    result = transform.apply(parser.parse('10d1rl')).eval
-    expect(result).to eq(9)
+    result = transform.apply(parser.parse('10d10rl')).eval
+    expect(result).to eq(54)
+  end
+
+  it 'evaluates a dice pool that removes the two highest and lowest values [10d10r2hr2l]' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    transform = TTRPG::DiceRoller::DiceNotationTransform.new
+    result = transform.apply(parser.parse('10d10r2hr2l')).eval
+    expect(result).to eq(33)
   end
 end

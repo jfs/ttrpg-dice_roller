@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'parslet'
+require_relative 'strategy'
 
 module TTRPG
   module DiceRoller
@@ -11,7 +12,15 @@ module TTRPG
         rolls = []
 
         evaled_count.times do
-          rolls << rand(1..sides.eval)
+          case ENV['DICE_ROLLER_STRATEGY']
+          when TTRPG::DiceRoller::SEQUENCE
+            ENV['DICE_ROLLER_SEQUENCE_COUNT'] ||= '0'
+            evaled_sides = sides.eval
+            rolls << (1..evaled_sides).to_a[ENV['DICE_ROLLER_SEQUENCE_COUNT'].to_i % evaled_sides]
+            ENV['DICE_ROLLER_SEQUENCE_COUNT'] = "#{(ENV['DICE_ROLLER_SEQUENCE_COUNT'].to_i + 1).to_s}"
+          else
+            rolls << rand(1..sides.eval)
+          end
         end
         return rolls
       end
