@@ -5,41 +5,44 @@ require 'parslet'
 module TTRPG
   module DiceRoller
     class DiceNotationParser < Parslet::Parser
-      # whitespace
-      rule(:space)  { match('\s').repeat(1) }
-      rule(:space?) { space.maybe }
-
       # grouping literals
       rule(:lparen) { str('(') }
       rule(:rparen) { str(')') }
 
-      # dice notation
-      rule(:dice_pool) { integer.maybe.as(:count) >> match('[dD]').as(:die) >> integer.as(:sides) }
-      rule(:remove_highest) { match('[rR]').as(:remove) >> integer.maybe.as(:count) >> match('[hH]').as(:highest) }
-      rule(:remove_lowest) { match('[rR]').as(:remove) >> integer.maybe.as(:count) >> match('[lL]').as(:lowest) }
+      # dice notation literals
+      rule(:die) { (str('d')) }
+      rule(:from) { str('h') | str('l') }
+      rule(:reduce) { str('k') | str('r') }
+      rule(:compare) { str('a') | str('b') }
+
+      # dice notation grammar
+      rule(:pool) { pool_op.maybe.as(:count) >> die.as(:die) >> pool_op.as(:sides) }
+      rule(:mods) { reduce.as(:reduce) >> from.maybe.as(:from) >> pool_op.maybe.as(:count) }
+      rule(:target) { compare.as(:compare) >> pool_op.as(:threshold) }
+      rule(:pool_op) { group | int }
 
       # operators
-      rule(:op_addition) { str('+').as(:plus) }
-      rule(:op_subtraction) { str('-').as(:minus) }
-      rule(:op_multiplication) { str('*').as(:times) }
-      rule(:op_division) { str('/').as(:divided_by) }
+      rule(:plus) { str('+') }
+      rule(:minus) { str('-') }
+      rule(:times) { str('*') }
+      rule(:divided_by) { str('/') }
 
       # operands
-      rule(:group) { lparen >> space? >> expression.as(:group) >> space? >> rparen }
-      rule(:dice_notation) { dice_pool.as(:dice_pool) >> remove_highest.maybe.as(:remove_highest) >> remove_lowest.maybe.as(:remove_lowest) }
-      rule(:integer) { match('\d').repeat(1).as(:integer) }
-      rule(:operand) { group | dice_notation | integer }
+      rule(:group) { lparen >> exp.as(:group) >> rparen }
+      rule(:notation) { pool.as(:pool) >> mods.repeat.as(:reduce) >> target.maybe.as(:target) }
+      rule(:int) { match('\d').repeat(1).as(:int) }
+      rule(:op) { group | notation | int }
 
       # statements
-      rule(:addition) { operand.as(:left) >> space? >> op_addition >> space? >> expression.as(:right) }
-      rule(:subtraction) { operand.as(:left) >> space? >> op_subtraction >> space? >> expression.as(:right) }
-      rule(:multiplication) { operand.as(:left) >> space? >> op_multiplication >> space? >> expression.as(:right) }
-      rule(:division) { operand.as(:left) >> space? >> op_division >> space? >> expression.as(:right) }
-      rule(:arithmetic) { addition | subtraction | multiplication | division }
+      rule(:add) { op.as(:left) >> plus.as(:plus) >> exp.as(:right) }
+      rule(:subtract) { op.as(:left) >> minus.as(:minus) >> exp.as(:right) }
+      rule(:multiply) { op.as(:left) >> times.as(:times) >> exp.as(:right) }
+      rule(:divide) { op.as(:left) >> divided_by.as(:divided_by) >> exp.as(:right) }
+      rule(:arithmetic) { add | subtract | multiply | divide }
       
-      # expression
-      rule(:expression) { space? >> (arithmetic | operand) >> space? }
-      root(:expression)
+      # expressions
+      rule(:exp) { arithmetic | op | notation }
+      root(:exp)
     end
   end
 end

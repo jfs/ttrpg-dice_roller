@@ -9,77 +9,158 @@ Feature: Dice Roller CLI
       | DICE_ROLLER_STRATEGY       | SEQUENCE |
       | DICE_ROLLER_SEQUENCE_COUNT | 0        |
 
-  Scenario: Echo a single integer
-    When I run `roll 11`
-    Then the output should contain exactly "11"
-    And the exit status should be 0
-
-  Scenario: Add two integers
-    When I run `roll 11+11`
-    Then the output should contain exactly "22"
-    And the exit status should be 0
-
-  Scenario: Subtract two integers
-    When I run `roll 11-11`
-    Then the output should contain exactly "0"
-    And the exit status should be 0
-
-  Scenario: Multiply two integers
-    When I run `roll 11*11`
-    Then the output should contain exactly "121"
-    And the exit status should be 0
-
-  Scenario: Divide two integers
-    When I run `roll 11/11`
+  Scenario: Run command: roll 1
+    When I run `roll 1`
     Then the output should contain exactly "1"
     And the exit status should be 0
 
-  Scenario: Combine mixed operations
-    When I run `roll 32+16-4*4/2`
-    Then the output should contain exactly "40"
+  Scenario: Run command: roll 111
+    When I run `roll 111`
+    Then the output should contain exactly "111"
     And the exit status should be 0
 
-  Scenario: Support operation precedence via parenthesis
-    When I run `roll (((32+16)-4)*4)/2`
-    Then the output should contain exactly "88"
+  Scenario: Run command: roll 2+2
+    When I run `roll 2+2`
+    Then the output should contain exactly "4"
     And the exit status should be 0
 
-  Scenario: Rolls a dice pool
-    When I run `roll 10d10`
-    Then the output should contain exactly "55"
+  Scenario: Run command: roll 2+2+2
+    When I run `roll 2+2+2`
+    Then the output should contain exactly "6"
     And the exit status should be 0
 
-  Scenario: Rolls a dice pool as part of arithmetic
-    When I run `roll 10*10d10`
-    Then the output should contain exactly "550"
+  Scenario: Run command: roll 2-2
+    When I run `roll 2-2`
+    Then the output should contain exactly "0"
     And the exit status should be 0
 
-  Scenario: Rolls a dice pool with implied count of 1
+  Scenario: Run command: roll 2-2-2
+    When I run `roll 2-2-2`
+    Then the output should contain exactly "2"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 2+2-2
+    When I run `roll 2+2-2`
+    Then the output should contain exactly "2"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 2*2
+    When I run `roll 2*2`
+    Then the output should contain exactly "4"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 2*2*2
+    When I run `roll 2*2*2`
+    Then the output should contain exactly "8"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 2+2-2*2
+    When I run `roll 2+2-2*2`
+    Then the output should contain exactly "0"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 2/2
+    When I run `roll 2/2`
+    Then the output should contain exactly "1"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 2/2/2
+    When I run `roll 2/2/2`
+    Then the output should contain exactly "2"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 2+2-2*2/2
+    When I run `roll 2+2-2*2/2`
+    Then the output should contain exactly "2"
+    And the exit status should be 0
+
+  Scenario: Run command: roll ((((2+2)-2)*2)/2)
+    When I run `roll ((((2+2)-2)*2)/2)`
+    Then the output should contain exactly "2"
+    And the exit status should be 0
+
+  Scenario: Run command: roll d10
     When I run `roll d10`
     Then the output should contain exactly "1"
     And the exit status should be 0
 
-  Scenario: Rolls a dice pool that removes the 2 highest values
-    When I run `roll 10d10r2h`
-    Then the output should contain exactly "36"
+  Scenario: Run command: roll 10d10
+    When I run `roll 10d10`
+    Then the output should contain exactly "55"
     And the exit status should be 0
 
-  Scenario: Rolls a dice pool that removes an implied 1 highest value
-    When I run `roll 10d10rh`
-    Then the output should contain exactly "45"
+  Scenario: Run command: roll 10*10d10
+    When I run `roll 10*10d10`
+    Then the output should contain exactly "550"
     And the exit status should be 0
 
-  Scenario: Rolls a dice pool that removes the 2 lowest values
-    When I run `roll 10d10r2l`
-    Then the output should contain exactly "52"
+  Scenario: Run command: roll 10d10r
+    When I run `roll 10d10r`
+    Then the output should contain exactly "54"
     And the exit status should be 0
 
-  Scenario: Rolls a dice pool that removes an implied 1 lowest value
+  Scenario: Run command: roll 10d10rl
     When I run `roll 10d10rl`
     Then the output should contain exactly "54"
     And the exit status should be 0
 
-  Scenario: Rolls a dice pool that removes the 2 highest and lowest values
-    When I run `roll 10d10r2hr2l`
+  Scenario: Run command: roll 10d10rl2
+    When I run `roll 10d10rl2`
+    Then the output should contain exactly "52"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 10d10rh
+    When I run `roll 10d10rh`
+    Then the output should contain exactly "45"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 10d10rh2
+    When I run `roll 10d10rh2`
+    Then the output should contain exactly "36"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 10d10rl2rh2
+    When I run `roll 10d10rl2rh2`
     Then the output should contain exactly "33"
     And the exit status should be 0
+
+  Scenario: Run command: roll 10d10a8
+    When I run `roll 10d10a8`
+    Then the output should contain exactly "3"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 10d10b8
+    When I run `roll 10d10b8`
+    Then the output should contain exactly "8"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 10d10rl2rh2a8
+    When I run `roll 10d10rl2rh2a8`
+    Then the output should contain exactly "1"
+    And the exit status should be 0
+
+  Scenario: Run command: roll (1d2)d10
+    When I run `roll (1d2)d10`
+    Then the output should contain exactly "2"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 10d(3d6)
+    When I run `roll 10d(3d6)`
+    Then the output should contain exactly "37"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 10d10rl(1d2)
+    When I run `roll 10d10rl(1d2)`
+    Then the output should contain exactly "54"
+    And the exit status should be 0
+
+  Scenario: Run command: roll 10d10a(2d2)
+    When I run `roll 10d10a(2d2)`
+    Then the output should contain exactly "8"
+    And the exit status should be 0
+
+  Scenario: Run command: roll (10d10)d(10d10)rl(2*1d2)rh(2*1d2)a(2*2d2)
+    When I run `roll (10d10)d(10d10)rl(2*1d2)rh(2*1d2)a(2*2d2)`
+    Then the output should contain exactly "48"
+    And the exit status should be 0
+

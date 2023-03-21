@@ -4,548 +4,232 @@ require 'parslet/convenience'
 
 RSpec.describe TTRPG::DiceRoller::DiceNotationParser do
 
-  it 'parses single digit integers [1]' do
+  it 'parses: 1' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('1')
-    expect(result).to include({
-      integer: '1'
-    })
+    expect(result).to include({int:'1'})
   end
 
-  it 'parses multi digit integers [111]' do
+  it 'parses: 111' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('111')
-    expect(result).to include({
-      integer: '111'
-    })
+    expect(result).to include({int:'111'})
   end
 
-  it 'does not parse negative integers [-111]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    expect { parser.parse('-111') }.to raise_error(Parslet::ParseFailed)
-  end
-
-  it 'does not parse decimals [111.1]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    expect { parser.parse('111.1') }.to raise_error(Parslet::ParseFailed)
-  end
-
-  it 'parses addition operators [+]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.op_addition.parse('+')
-    expect(result).to include({
-      plus: '+'
-    })
-  end
-
-  it 'parses simple addition statements [2+2]' do
+  it 'parses: 2+2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2+2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      plus: '+',
-      right: {
-        integer: '2'
-      }
-    })
+    expect(result).to include({left:{int:'2'},plus:'+',right:{int:'2'}})
   end
 
-  it 'parses simple addition statements that include whitespace [2 + 2]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('2 + 2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      plus: '+',
-      right: {
-        integer: '2'
-      }
-    })
-  end
-
-  it 'parses compound addition statements from right to left [2+2+2]' do
+  it 'parses: 2+2+2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2+2+2')
     expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      plus: '+',
-      right: {
-        left: {
-          integer: '2'
-        },
-        plus: '+',
-        right: {
-          integer: '2'
-        }
-      }
+      left:{int:'2'},plus:'+',right:{left:{int:'2'},plus:'+',right:{int:'2'}}
     })
   end
 
-  it 'parses subtraction operators [-]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.op_subtraction.parse('-')
-    expect(result).to include({
-      minus: '-'
-    })
-  end
-
-  it 'parses simple subtraction statements [2-2]' do
+  it 'parses: 2-2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2-2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      minus: '-',
-      right: {
-        integer: '2'
-      }
-    })
+    expect(result).to include({left:{int:'2'},minus:'-',right:{int:'2'}})
   end
 
-  it 'parses simple subtraction statements that include whitespace [2 - 2]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('2 - 2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      minus: '-',
-      right: {
-        integer: '2'
-      }
-    })
-  end
-
-  it 'parses compound subtraction statements from right to left [2-2-2]' do
+  it 'parses: 2-2-2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2-2-2')
     expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      minus: '-',
-      right: {
-        left: {
-          integer: '2'
-        },
-        minus: '-',
-        right: {
-          integer: '2'
-        }
-      }
+      left:{int:'2'},minus:'-',right:{left:{int:'2'},minus:'-',right:{int:'2'}}
     })
   end
 
-  it 'parses compound mixed statements from right to left [2+2-2]' do
+  it 'parses: 2+2-2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2+2-2')
     expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      plus: '+',
-      right: {
-        left: {
-          integer: '2'
-        },
-        minus: '-',
-        right: {
-          integer: '2'
-        }
-      }
+      left:{int:'2'},plus:'+',right:{left:{int:'2'},minus:'-',right:{int:'2'}}
     })
   end
 
-  it 'parses multiplication operators [*]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.op_multiplication.parse('*')
-    expect(result).to include({
-      times: '*'
-    })
-  end
-
-  it 'parses simple multiplication statements [2*2]' do
+  it 'parses: 2*2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2*2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      times: '*',
-      right: {
-        integer: '2'
-      }
-    })
+    expect(result).to include({left:{int:'2'},times:'*',right:{int:'2'}})
   end
 
-  it 'parses simple multiplication statements that include whitespace [2 * 2]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('2 * 2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      times: '*',
-      right: {
-        integer: '2'
-      }
-    })
-  end
-
-  it 'parses compound multiplication statements from right to left [2*2*2]' do
+  it 'parses: 2*2*2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2*2*2')
     expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      times: '*',
-      right: {
-        left: {
-          integer: '2'
-        },
-        times: '*',
-        right: {
-          integer: '2'
-        }
-      }
+      left:{int:'2'},times:'*',right:{left:{int:'2'},times:'*',right:{int:'2'}}
     })
   end
 
-  it 'parses compound mixed statements from right to left [2+2-2*2]' do
+  it 'parses: 2+2-2*2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2+2-2*2')
     expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      plus: '+',
-      right: {
-        left: {
-          integer: '2'
-        },
-        minus: '-',
-        right: {
-          left: {
-            integer: '2'
-          },
-          times: '*',
-          right: {
-            integer: '2'
-          }
-        }
-      }
-    })
-  end
-
-  it 'parses division operators [/]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.op_division.parse('/')
-    expect(result).to include({
-      divided_by: '/'
+      left:{int:'2'},plus:'+',right:{left:{int:'2'},minus:'-',right:{
+        left:{int:'2'},times:'*',right:{int:'2'}
+      }}
     })
   end
   
-  it 'parses simple division statements [2/2]' do
+  it 'parses: 2/2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2/2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      divided_by: '/',
-      right: {
-        integer: '2'
-      }
-    })
+    expect(result).to include({left:{int:'2'},divided_by:'/',right:{int:'2'}})
   end
   
-  it 'parses simple division statements that include whitespace [2 / 2]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('2 / 2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      divided_by: '/',
-      right: {
-        integer: '2'
-      }
-    })
-  end
-  
-  it 'parses compound division statements from right to left [2/2/2]' do
+  it 'parses: 2/2/2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2/2/2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      divided_by: '/',
-      right: {
-        left: {
-          integer: '2'
-        },
-        divided_by: '/',
-        right: {
-          integer: '2'
-        }
-      }
-    })
+    expect(result).to include({left:{int:'2'},divided_by:'/',right:{left:{int:'2'},divided_by:'/',
+      right:{int:'2'}}})
   end
   
-  it 'parses compound mixed statements from right to left [2+2-2*2/2]' do
+  it 'parses: 2+2-2*2/2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('2+2-2*2/2')
-    expect(result).to include({
-      left: {
-        integer: '2'
-      },
-      plus: '+',
-      right: {
-        left: {
-          integer: '2'
-        },
-        minus: '-',
-        right: {
-          left: {
-            integer: '2'
-          },
-          times: '*',
-          right: {
-            left: {
-              integer: '2'
-            },
-            divided_by: '/',
-            right: {
-              integer: '2'
-            }
-          }
-        }
-      }
-    })
+    expect(result).to include({left:{int:'2'},plus:'+',right:{left:{int:'2'},minus:'-',
+      right:{left:{int:'2'},times:'*',right:{left:{int:'2'},divided_by:'/',right:{int:'2'}}}}})
   end
 
-  it 'parses groups of integers and statements using parenthesis [((((2+2)-2)*2)/2)]' do
+  it 'parses: ((((2+2)-2)*2)/2)' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('((((2+2)-2)*2)/2)')
-    expect(result).to include({
-      group: {
-        left: {
-          group: {
-            left: {
-              group: {
-                left: {
-                  group: {
-                    left:  {
-                      integer: '2'
-                    },
-                    plus: '+',
-                    right: {
-                      integer: '2'
-                    }
-                  }
-                },
-                minus: '-',
-                right: {
-                  integer: '2'
-                }
-              }
-            },
-            times: '*',
-            right: {
-              integer: '2'
-            }
-          }
-        },
-        divided_by: '/',
-        right: {
-          integer: '2'
-        }
-      }
-    })
+    expect(result).to include({group:{left:{group:{left:{group:{left:{group:{left:{int:'2'},
+      plus:'+',right:{int:'2'}}},minus:'-',right:{int:'2'}}},times:'*',right:{int:'2'}}},
+      divided_by:'/',right:{int:'2'}}})
   end
 
-  it 'parses a dice pool [10d10]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('10d10')
-    expect(result).to include({
-      dice_pool: {
-        count: {
-          integer: '10'
-        },
-        die: 'd',
-        sides: {
-          integer: '10'
-        }
-      }
-    })
-  end
-
-  it 'parses a statement that includes a dice pool [10*10d10]' do
-    parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('10*10d10')
-    expect(result).to include({
-      left: {
-        integer: '10'
-      },
-      times: '*',
-      right: {
-        dice_pool: {
-          count: {
-            integer: '10'
-          },
-          die: 'd',
-          sides: {
-            integer: '10'
-          }
-        },
-        remove_highest: nil,
-        remove_lowest: nil
-      }
-    })
-  end
-
-  it 'parses a dice pool with implied count of 1 [d10]' do
+  it 'parses: d10' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('d10')
-    expect(result).to include({
-      dice_pool: {
-        count: nil,
-        die: 'd',
-        sides: {
-          integer: '10'
-        }
-      }
-    })
+    expect(result).to include({pool:{count:nil,die:'d',sides:{int:'10'}},reduce:[],target:nil})
   end
 
-  it 'parses a dice pool that removes the two highest values [10d10r2h]' do
+  it 'parses: 10d10' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('10d10r2h')
-    expect(result).to include({
-      dice_pool: {
-        count: {
-          integer: '10'
-        },
-        die: 'd',
-        sides: {
-          integer: '10'
-        }
-      },
-      remove_highest: {
-        remove: 'r',
-        count: {
-          integer: '2'
-        },
-        highest: 'h'
-      },
-      remove_lowest: nil
-    })
+    result = parser.parse_with_debug('10d10')
+    expect(result).to include({pool:{count:{int:'10'},die:'d',sides:{int:'10'}},reduce:[],
+      target:nil})
   end
 
-  it 'parses a dice pool that removes an implied one highest value [10d10rh]' do
+  it 'parses: 10*10d10' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('10d10rh')
-    expect(result).to include({
-      dice_pool: {
-        count: {
-          integer: '10'
-        },
-        die: 'd',
-        sides: {
-          integer: '10'
-        }
-      },
-      remove_highest: {
-        remove: 'r',
-        count: nil,
-        highest: 'h'
-      },
-      remove_lowest: nil
-    })
+    result = parser.parse_with_debug('10*10d10')
+    expect(result).to include({left:{int:'10'},times:'*',right:{pool:{count:{int:'10'},die:'d',
+      sides:{int:'10'}},reduce:[],target:nil}})
   end
 
-  it 'parses a dice pool that removes the two lowest values [10d10r2l]' do
+  it 'parses: 10d10r' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('10d10r2l')
-    expect(result).to include({
-      dice_pool: {
-        count: {
-          integer: '10'
-        },
-        die: 'd',
-        sides: {
-          integer: '10'
-        }
-      },
-      remove_highest: nil,
-      remove_lowest: {
-        remove: 'r',
-        count: {
-          integer: '2'
-        },
-        lowest: 'l'
-      }
-    })
+    result = parser.parse_with_debug('10d10r')
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},
+      reduce:[{reduce:'r',from:nil,count:nil}],target:nil})
   end
 
-  it 'parses a dice pool that removes an implied one lowest value [10d10rl]' do
+  it 'parses: 10d10rl' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
     result = parser.parse_with_debug('10d10rl')
-    expect(result).to include({
-      dice_pool: {
-        count: {
-          integer: '10'
-        },
-        die: 'd',
-        sides: {
-          integer: '10'
-        }
-      },
-      remove_highest: nil,
-      remove_lowest: {
-        remove: 'r',
-        count: nil,
-        lowest: 'l'
-      }
-    })
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},
+      reduce:[{reduce:'r',from:'l',count:nil}],target:nil})
   end
 
-  it 'parses a dice pool that removes the two highest and lowest values [10d10r2hr2l]' do
+  it 'parses: 10d10rl2' do
     parser = TTRPG::DiceRoller::DiceNotationParser.new
-    result = parser.parse_with_debug('10d10r2hr2l')
-    expect(result).to include({
-      dice_pool: {
-        count: {
-          integer: '10'
-        },
-        die: 'd',
-        sides: {
-          integer: '10'
-        }
-      },
-      remove_highest: {
-        remove: 'r',
-        count: {
-          integer: '2'
-        },
-        highest: 'h'
-      },
-      remove_lowest: {
-        remove: 'r',
-        count: {
-          integer: '2'
-        },
-        lowest: 'l'
-      }
-    })
+    result = parser.parse_with_debug('10d10rl2')
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},
+      reduce:[{reduce:'r',from:'l',count:{int:'2'}}],target:nil})
+  end
+
+  it 'parses: 10d10rh' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d10rh')
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},
+      reduce:[{reduce:'r',from:'h',count:nil}],target:nil})
+  end
+
+  it 'parses: 10d10rh2' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d10rh2')
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},
+      reduce:[{reduce:'r',from:'h',count:{int:'2'}}],target:nil})
+  end
+
+  it 'parses: 10d10rl2rh2' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d10rl2rh2')
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},
+      reduce:[{reduce:'r',from:'l',count:{int:'2'}},{reduce:'r',from:'h',count:{int:'2'}}],
+      target:nil})
+  end
+
+  it 'parses: 10d10a8' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d10a8')
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},reduce:[],
+      target:{compare:'a',threshold:{int:'8'}}})
+  end
+
+  it 'parses: 10d10b8' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d10b8')
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},reduce:[],
+      target:{compare:'b',threshold:{int:'8'}}})
+  end
+
+  it 'parses: 10d10rl2rh2a8' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d10rl2rh2a8')
+    expect(result).to include({pool:{count:{int:'10'},die: "d",sides:{int:'10'}},
+      reduce:[{reduce:'r',from:'l',count:{int:'2'}},{reduce:'r',from:'h',count:{int:'2'}}],
+      target:{compare:'a',threshold:{int:'8'}}})
+  end
+
+  it 'parses: (1d2)d10' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('(1d2)d10')
+    expect(result).to include({pool:{count:{group:{pool:{count:{int:"1"},die:"d",sides:{int:"2"}},
+      reduce:[],target:nil}},die:"d",sides:{int:"10"}},reduce:[],target:nil})
+  end
+
+  it 'parses: 10d(3d6)' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d(3d6)')
+    expect(result).to include({pool:{count:{int:"10"},die:"d",sides:{group:{pool:{count:{int:"3"},
+      die:"d",sides:{int:"6"}},reduce:[],target:nil}}},reduce:[],target:nil})
+  end
+
+  it 'parses: 10d10rl(1d2)' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d10rl(1d2)')
+    expect(result).to include({pool:{count:{int:"10"},die:"d",sides:{int:"10"}},reduce:[{reduce:"r",
+      from:"l",count:{group:{pool:{count:{int:"1"},die:"d",sides:{int:"2"}},reduce:[],
+      target:nil}}}],target:nil})
+  end
+
+  it 'parses: 10d10a(1d2)' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('10d10a(1d2)')
+    expect(result).to include({pool:{count:{int:"10"},die:"d",sides:{int:"10"}},reduce:[],
+      target:{compare:"a",threshold:{group:{pool:{count:{int:"1"},die:"d",sides:{int:"2"}},
+      reduce:[],target:nil}}}})
+  end
+
+  it 'parses: (10d10)d(10d10)rl(2*1d2)rh(2*1d2)a(2*2d2)' do
+    parser = TTRPG::DiceRoller::DiceNotationParser.new
+    result = parser.parse_with_debug('(10d10)d(10d10)rl(2*1d2)rh(2*1d2)a(2*2d2)')
+    expect(result).to include({pool:{count:{group:{pool:{count:{int:"10"},die:"d",sides:{int:"10"}},
+      reduce:[],target:nil}},die:"d",sides:{group:{pool:{count:{int:"10"},die:"d",sides:{int:"10"}},
+      reduce:[],target:nil}}},reduce:[{reduce:"r",from:"l",count:{group:{left:{int:"2"},times:"*",
+        right:{pool:{count:{int:"1"},die:"d",sides:{int:"2"}},reduce:[],target:nil}}}},{reduce:"r",
+          from:"h",count:{group:{left:{int:"2"},times:"*",right:{pool:{count:{int:"1"},die:"d",
+          sides:{int:"2"}},reduce:[],target:nil}}}}],target:{compare:"a",
+            threshold:{group:{left:{int:"2"},times:"*",right:{pool:{count:{int:"2"},die:"d",
+            sides:{int:"2"}},reduce:[],target:nil}}}}})
   end
 
 end

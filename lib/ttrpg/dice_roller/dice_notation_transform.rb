@@ -6,47 +6,54 @@ require_relative 'strategy'
 module TTRPG
   module DiceRoller
     # dice notation
-    DicePool = Struct.new(:count, :die, :sides) {
+    Pool = Struct.new(:count, :die, :sides) {
       def roll
         evaled_count = count != nil ? count.eval : 1
+        evaled_sides = sides.eval
         rolls = []
 
         evaled_count.times do
           case ENV['DICE_ROLLER_STRATEGY']
           when TTRPG::DiceRoller::SEQUENCE
             ENV['DICE_ROLLER_SEQUENCE_COUNT'] ||= '0'
-            evaled_sides = sides.eval
+            evaled_sides = evaled_sides
             rolls << (1..evaled_sides).to_a[ENV['DICE_ROLLER_SEQUENCE_COUNT'].to_i % evaled_sides]
             ENV['DICE_ROLLER_SEQUENCE_COUNT'] = "#{(ENV['DICE_ROLLER_SEQUENCE_COUNT'].to_i + 1).to_s}"
           else
-            rolls << rand(1..sides.eval)
+            rolls << rand(1..evaled_sides)
           end
         end
         return rolls
       end
     }
 
-    RemoveHighest = Struct.new(:remove, :count, :highest) {
-      def remove(dice_pool)
+    Reduce = Struct.new(:remove, :from, :count) {
+      def remove(pool)
         evaled_count = count != nil ? count.eval : 1
+        evaled_from = from != nil ? from.str : 'l'
         
-        dice_pool.sort!
+        pool.sort!
         evaled_count.times do
-          dice_pool.pop if dice_pool.size > 0
+          ('h'.eql?(evaled_from) ? pool.pop : pool.shift) if pool.size > 0
         end
-        return dice_pool
+        return pool
       end
     }
 
-    RemoveLowest = Struct.new(:remove, :count, :lowest) {
-      def remove(dice_pool)
-        evaled_count = count != nil ? count.eval : 1
-        
-        dice_pool.sort!
-        evaled_count.times do
-          dice_pool.shift if dice_pool.size > 0
+    Target = Struct.new(:compare, :threshold) {
+      def eval(pool)
+        successes = 0
+        evaled_threshold = threshold.eval
+
+        pool.each do |die|
+          case compare.str
+          when 'a'
+            successes += 1 if die >= evaled_threshold
+          else
+            successes += 1 if die <= evaled_threshold
+          end
         end
-        return dice_pool
+        return successes
       end
     }
 
@@ -57,23 +64,29 @@ module TTRPG
       end
     }
 
-    DiceNotation = Struct.new(:dice_pool, :remove_highest, :remove_lowest) {
+    Notation = Struct.new(:pool, :reduce, :target) {
       def eval
-        final_result = 0
-        dice_rolls = dice_pool.roll
-        dice_rolls = remove_highest.remove(dice_rolls) if remove_highest
-        dice_rolls = remove_lowest.remove(dice_rolls) if remove_lowest
+        dice = pool.roll
 
-        dice_rolls.each do |value|
-          final_result += value
+        reduce.each do |mod|
+          dice = mod.remove(dice)
         end
-        return final_result
+        if target != nil
+          return target.eval(dice)
+        else
+          dice_total = 0
+
+          dice.each do |die|
+            dice_total += die
+          end
+          return dice_total
+        end
       end
     }
 
-    IntegerLiteral = Struct.new(:integer) {
+    IntegerLiteral = Struct.new(:int) {
       def eval
-        integer.to_i
+        int.to_i
       end
     }
 
@@ -108,19 +121,18 @@ module TTRPG
         count: simple(:count),
         die: simple(:die),
         sides: simple(:sides)
-      }) { DicePool.new(count, die, sides) }
+      }) { Pool.new(count, die, sides) }
     
       rule({
-        remove: simple(:remove),
-        count: simple(:count),
-        highest: simple(:highest)
-      }) { RemoveHighest.new(remove, count, highest) }
+        reduce: simple(:reduce),
+        from: simple(:from),
+        count: simple(:count)
+      }) { Reduce.new(reduce, from, count) }
     
       rule({
-        remove: simple(:remove),
-        count: simple(:count),
-        lowest: simple(:lowest)
-      }) { RemoveLowest.new(remove, count, lowest) }
+        compare: simple(:compare),
+        threshold: simple(:threshold)
+      }) { Target.new(compare, threshold) }
     
       # operands
       rule({
@@ -128,16 +140,14 @@ module TTRPG
       }) { ExpressionGroup.new(group) }
     
       rule({
-        dice_pool: simple(:dice_pool),
-        remove_highest: simple(:remove_highest),
-        remove_lowest: simple(:remove_lowest)
-      }) { DiceNotation.new(dice_pool, remove_highest, remove_lowest) }
+        pool: simple(:pool),
+        reduce: sequence(:reduce),
+        target: simple(:target)
+      }) { Notation.new(pool, reduce, target) }
 
       rule({
-        integer: simple(:integer)
-      }) { IntegerLiteral.new(integer) }
-    
-      # rule(:dice_pool => simple(:dice_pool)) { DiceNotation.new(dice_pool) }
+        int: simple(:int)
+      }) { IntegerLiteral.new(int) }
 
       # operations
       rule({
