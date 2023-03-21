@@ -10,6 +10,9 @@
 # rspec failure tracking
 .rspec_status
 
+# built gem
+*.gem
+
 # Created by https://www.toptal.com/developers/gitignore/api/macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos
 

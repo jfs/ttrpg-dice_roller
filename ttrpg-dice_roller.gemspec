@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Jason Stahl"]
   spec.email = ["contact+#{spec.name}@mechjack.com"]
 
-  spec.summary = "A dice rolling TUI and Ruby library."
+  spec.summary = "A dice rolling CLI and Ruby library."
   spec.description = "A dice rolling CLI and Ruby library powered by a rich dice notation grammar."
   spec.homepage = "https://github.com/jfs/#{spec.name}"
   spec.required_ruby_version = ">= 3.0.0"
